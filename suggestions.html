@@ -33,94 +33,71 @@
 
 <section class="container">
   <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
-    
-    <!-- Privacy Notice -->
-    <div style="margin-bottom:15px; background:#2a2a3d; padding:10px; border-radius:8px; font-size:0.9em; color:#ccc;">
-      <strong>Privacy Notice:</strong> When you submit a suggestion, we log your IP address along with your submission to help prevent abuse.
-      We only use this for security and moderation purposes. Inappropriate suggestions may result in being blocked from future submissions.
-      For more information, please see our <a href="privacy.html" style="color:#66b3ff;">Privacy Policy</a>.
-    </div>
-
+    <p style="margin-bottom:10px; font-size:14px;">
+      By submitting, you agree that we log your IP address for 30 days (longer if banned). 
+      <a href="privacy.html" target="_blank" style="color:#4da3ff;">Read our Privacy Policy</a>.
+    </p>
     <form id="suggestionForm">
-      <label for="username" style="display:block; margin-bottom:6px; font-weight:bold;">Roblox Username</label>
-      <input type="text" id="username" name="username" placeholder="Your Roblox Username" required 
-        style="width:100%; padding:10px; margin-bottom:15px; border:none; border-radius:8px; background:#2a2a3d; color:#fff;" />
-      
-      <label for="suggestion" style="display:block; margin-bottom:6px; font-weight:bold;">Your Suggestion</label>
-      <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required 
-        style="width:100%; padding:10px; margin-bottom:15px; border:none; border-radius:8px; background:#2a2a3d; color:#fff;"></textarea>
-      
-      <!-- Consent checkbox -->
-      <label style="display:block; margin-bottom:15px; font-size:0.9em;">
-        <input type="checkbox" id="consentCheckbox" /> I agree to the privacy notice and consent to my IP being logged for moderation purposes.
+      <label for="username">Roblox Username</label>
+      <input type="text" id="username" name="username" required />
+
+      <label for="suggestion">Your Suggestion</label>
+      <textarea id="suggestion" name="suggestion" rows="5" required></textarea>
+
+      <label style="display:block; margin:10px 0;">
+        <input type="checkbox" id="consentCheckbox" /> 
+        I agree to the IP logging policy
       </label>
 
-      <button type="submit" id="submitBtn" class="btn primary" disabled
-        style="padding:12px 20px; width:100%; border:none; border-radius:8px; font-weight:bold;
-               background:linear-gradient(90deg,#007bff,#6610f2); color:white; cursor:pointer;">
+      <button type="submit" id="submitBtn" disabled>
         Submit Suggestion
       </button>
     </form>
   </div>
 </section>
 
-  <footer>
-    <div class="footer-inner">
-      <div class="brand" aria-hidden="true">
-        <span class="logo"></span>
-        <span>Coventry Roleplay</span>
-      </div>
-      <div class="tiny">© <span id="year"></span> Coventry Roleplay • Unofficial fan content, not endorsed by Roblox.</div>
-    </div>
-  </footer>
+<script>
+  const consentCheckbox = document.getElementById('consentCheckbox');
+  const submitBtn = document.getElementById('submitBtn');
 
-  <script>
-    // Enable submit only if consent is checked
-    const consentCheckbox = document.getElementById("consentCheckbox");
-    const submitBtn = document.getElementById("submitBtn");
-    consentCheckbox.addEventListener("change", function() {
-      submitBtn.disabled = !this.checked;
-    });
+  consentCheckbox.addEventListener('change', () => {
+    submitBtn.disabled = !consentCheckbox.checked;
+  });
 
-    // Handle form submission with JSON payload
-    document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      if (!consentCheckbox.checked) {
-        alert("You must agree to the privacy notice to submit a suggestion.");
-        return;
+  document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    if (!consentCheckbox.checked) {
+      alert("You must agree to our IP logging policy to submit.");
+      return;
+    }
+
+    const form = e.target;
+    const payload = {
+      username: form.username.value,
+      suggestion: form.suggestion.value
+    };
+
+    try {
+      const res = await fetch("https://your-backend-url/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+
+      if (res.ok && result.success) {
+        alert("✅ Suggestion submitted successfully!");
+        form.reset();
+        submitBtn.disabled = true; // reset consent
+      } else {
+        alert("❌ Failed: " + (result.error || "Unknown error"));
       }
-      const form = e.target;
-
-      const payload = {
-        username: form.username.value,
-        suggestion: form.suggestion.value
-      };
-
-      try {
-        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/suggest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const result = await res.json();
-
-        if (res.ok && result.success) {
-          alert("✅ Suggestion submitted successfully!");
-          form.reset();
-          submitBtn.disabled = true; // reset consent checkbox too
-          consentCheckbox.checked = false;
-        } else {
-          alert("❌ Failed to submit suggestion: " + (result.error || "Unknown error"));
-        }
-      } catch (err) {
-        console.error(err);
-        alert("⚠️ Error sending suggestion.");
-      }
-    });
-
-    // Set the current year in the footer
-    document.getElementById("year").textContent = new Date().getFullYear();
-  </script>
+    } catch (err) {
+      console.error(err);
+      alert("⚠️ Error sending suggestion.");
+    }
+  });
+</script>
 </body>
 </html>
+
