@@ -32,8 +32,9 @@
   </section>
 
   <section class="container">
-    <div class="card reveal" style="max-width:600px;margin:auto">
-      <form id="suggestionForm" method="POST" action="https://bennydog138.github.io/backend/app.py">
+    <div class="card reveal" style="max-width:600px;margin:auto; padding:20px;">
+      <!-- Don't redirect away from this page -->
+      <form id="suggestionForm">
         <label for="username">Roblox Username</label>
         <input type="text" id="username" name="username" placeholder="Your Roblox Username" required />
         
@@ -56,14 +57,14 @@
   </footer>
 
   <script>
-    // Show success message without reloading page
+    // Handle form submission with fetch instead of redirect
     document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const form = e.target;
       const data = new FormData(form);
 
       try {
-        const res = await fetch(form.action, {
+        const res = await fetch("https://bennydog138.github.io/backend/app.py", {
           method: "POST",
           body: data
         });
@@ -75,13 +76,13 @@
           alert("Failed to submit suggestion.");
         }
       } catch (err) {
+        console.error(err);
         alert("Error sending suggestion.");
       }
     });
 
     // Set the current year in the footer
-    document.getElementById('year').textContent = new Date().getFullYear();
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
-
