@@ -33,7 +33,7 @@
 
   <section class="container">
     <div class="card reveal" style="max-width:600px;margin:auto">
-      <form id="suggestionForm">
+      <form id="suggestionForm" method="POST" action="https://your-backend-url.com/suggest">
         <label for="username">Roblox Username</label>
         <input type="text" id="username" name="username" placeholder="Your Roblox Username" required />
         
@@ -55,38 +55,32 @@
     </div>
   </footer>
 
-  <script src="script.js"></script>
-<script>
-  // Handle suggestion submission to Discord webhook
-  document.getElementById('suggestionForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+  <script>
+    // Show success message without reloading page
+    document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
 
-    const username = document.getElementById('username').value;
-    const suggestion = document.getElementById('suggestion').value;
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: data
+        });
 
-    // Replace with your actual Discord webhook URL
-    const webhookURL = "https://discord.com/api/webhooks/1410316932913041489/D93VSFxs5oBlnLYhWYlyCMzaUdEcEeHsOjaWvXpjup2qm2wNqvWKTBXb36MCH_Y3jJg1";
+        if (res.ok) {
+          alert("Suggestion submitted successfully!");
+          form.reset();
+        } else {
+          alert("Failed to submit suggestion.");
+        }
+      } catch (err) {
+        alert("Error sending suggestion.");
+      }
+    });
 
-    fetch(webhookURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        embeds: [{
-          title: `Suggestion from ${username}`,
-          description: suggestion,
-          color: 0x00ff00 // optional: green color
-        }]
-      })
-    })
-    .then(res => {
-      if(res.ok) alert("Suggestion submitted successfully!");
-      else alert("Failed to submit suggestion.");
-    })
-    .catch(() => alert("Error sending suggestion."));
-  });
-
-  // Set the current year in the footer
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
+    // Set the current year in the footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
