@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coventry Roleplay — Home</title>
+  <meta name="description" content="Official website for Coventry Roleplay on Roblox. Join services, meet leadership, and get involved!" />
+  <style>
+    /* ---------------------------------------------
+       Coventry Roleplay — TEMP styles inside index.html
+       (We'll extract this into style.css on the next step.)
+       --------------------------------------------- */
+    :root{
+      --bg:#0b0f14;               /* page background */
+      --panel:#0f1620;            /* nav/footer background */
+      --text:#e6eef6;             /* body text */
+      --muted:#96a3b3;            /* secondary text */
+      --card:rgba(255,255,255,.06); /* card bg */
+      --stroke:rgba(255,255,255,.12); /* borders */
+      --accent:#00e5ff;           /* cyan accent */
+      --accent-2:#7c3aed;         /* purple accent */
+      --radius:18px;
+      --shadow:0 10px 25px rgba(0,0,0,.35);
+      --max:1100px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,'Helvetica Neue',Arial,'Apple Color Emoji','Segoe UI Emoji';}
+    a{color:inherit;text-decoration:none}
+    img{max-width:100%;display:block}
+
+    /* --- Top Navigation --- */
+    header{
+      position:sticky;top:0;z-index:100;
+      backdrop-filter:saturate(160%) blur(10px);
+      background:linear-gradient(180deg,rgba(15,22,32,.75),rgba(15,22,32,.55));
+      border-bottom:1px solid var(--stroke);
+    }
+    .nav{max-width:var(--max);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.3px}
+    .brand .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 6px 18px rgba(0,229,255,.35);}
+    .brand span{font-size:1.05rem}
+
+    .links{display:flex;gap:18px;align-items:center}
+    .links a{position:relative;padding:8px 10px;border-radius:10px;color:var(--muted);transition:.25s ease}
+    .links a:hover{color:var(--text)}
+    .links a::after{content:"";position:absolute;left:10px;right:10px;bottom:6px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent-2));transform:scaleX(0);transform-origin:left;transition:transform .25s ease}
+    .links a:hover::after{transform:scaleX(1)}
+    .links a.active{color:var(--text)}
+
+    .menu-toggle{display:none;background:transparent;border:1px solid var(--stroke);color:var(--text);padding:8px 10px;border-radius:10px}
+
+    @media(max-width:840px){
+      .menu-toggle{display:inline-flex}
+      .links{position:absolute;inset:60px 12px auto 12px;background:var(--panel);border:1px solid var(--stroke);border-radius:16px;box-shadow:var(--shadow);padding:10px;flex-direction:column;gap:6px;display:none}
+      .links.open{display:flex}
+      .links a{padding:12px;border-radius:12px}
+    }
+
+    /* --- Hero Banner --- */
+    .hero{
+      position:relative;min-height:70vh;display:grid;place-items:center;overflow:hidden;border-bottom:1px solid var(--stroke);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(124,58,237,.18), transparent 50%),
+        radial-gradient(1200px 600px at 20% 110%, rgba(0,229,255,.15), transparent 50%),
+        #0b0f14;
+    }
+    .hero::before{ /* background image with dark overlay */
+      content:"";position:absolute;inset:0;z-index:-2;
+      background:linear-gradient(180deg,rgba(11,15,20,.6),rgba(11,15,20,.85)),
+                 url('https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=2000&auto=format&fit=crop');
+      background-size:cover;background-position:center;
+      filter:saturate(85%);
+    }
+    .hero-inner{max-width:var(--max);width:100%;padding:64px 18px;display:grid;gap:22px;align-items:center;justify-items:start}
+    .eyebrow{color:var(--muted);font-weight:700;letter-spacing:.25em;text-transform:uppercase}
+    .title{font-size:clamp(2rem,5vw,3.25rem);font-weight:900;line-height:1.05;margin:0}
+    .title .grad{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+    .subtitle{color:#cfe3f7;max-width:60ch}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+    .btn{--g1:var(--accent);--g2:var(--accent-2);position:relative;display:inline-flex;align-items:center;gap:10px;padding:12px 16px;border-radius:14px;border:1px solid var(--stroke);cursor:pointer;transition:transform .15s ease, box-shadow .2s ease}
+    .btn.primary{background:linear-gradient(135deg,var(--g1),var(--g2));color:#051017;border-color:transparent;box-shadow:0 10px 25px rgba(0,229,255,.28)}
+    .btn.primary:hover{transform:translateY(-2px)}
+    .btn.ghost{background:rgba(255,255,255,.05)}
+    .btn.ghost:hover{transform:translateY(-2px)}
+
+    /* --- Feature cards --- */
+    .container{max-width:var(--max);margin:0 auto;padding:42px 18px}
+    .section-title{font-size:1.6rem;margin:0 0 12px 0}
+    .muted{color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:620px){.grid{grid-template-columns:1fr}}
+
+    .card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+    .card::after{content:"";position:absolute;inset:auto -20% -40% -20%;height:70%;background:radial-gradient(600px 220px at 50% 0, rgba(124,58,237,.16), transparent 50%)}
+    .card h3{margin:0 0 8px 0}
+    .card p{margin:0;color:var(--muted)}
+    .card:hover{transform:translateY(-4px);transition:transform .25s ease}
+
+    .pill{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);font-size:.85rem;color:var(--muted)}
+
+    /* --- Footer --- */
+    footer{background:var(--panel);border-top:1px solid var(--stroke)}
+    .footer-inner{max-width:var(--max);margin:0 auto;padding:22px 18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .tiny{font-size:.9rem;color:var(--muted)}
+
+    /* --- Simple reveal-on-scroll animation --- */
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease, transform .6s ease}
+    .reveal.visible{opacity:1;transform:none}
+
+    .nav-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+   }
+  </style>
+</head>
+<body>
+  <header>
+  <nav class="nav" aria-label="Primary">
+    <a class="brand" href="index.html" aria-label="Coventry Roleplay Home">
+      <img src="CV.png" alt="Police Service Logo" class="nav-logo" />
+      <span>Coventry Roleplay</span>
+    </a>
+    <button class="menu-toggle" aria-expanded="false" aria-controls="site-links">Menu</button>
+    <div id="site-links" class="links" role="menubar">
+      <a role="menuitem" class="active" href="index.html">Home</a>
+      <a role="menuitem" href="leadership.html">Leadership</a>
+      <a role="menuitem" href="services.html">Services</a>
+      <a role="menuitem" href="contact.html">Contact</a>
+      <a role="menuitem" href="suggestions.html">Suggestions</a>
+    </div>
+  </nav>
+</header>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow reveal">Roblox Community • UK Inspired</span>
+      <h1 class="title reveal" style="transition-delay:.05s">Welcome to <span class="grad">Coventry Roleplay</span></h1>
+      <p class="subtitle reveal" style="transition-delay:.1s">An immersive roleplay world set in Coventry. Join a service, rank up through realistic training, and help shape the city with your ideas.</p>
+      <div class="cta reveal" style="transition-delay:.15s">
+        <a class="btn primary" href="https://www.roblox.com/communities/35365795/UK-Horizons-RP" rel="noopener">Play on Roblox</a>
+        <a class="btn ghost" href="https://discord.gg/Xfk9hP2KMS" rel="noopener">Join our Discord</a>
+      </div>
+      <div class="reveal" style="transition-delay:.2s">
+        <span class="pill">In Development</span>
+        <span class="pill">Updates weekly</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES / CALLOUTS -->
+  <section class="container">
+    <h2 class="section-title">What makes us different</h2>
+    <p class="muted" style="margin-bottom:18px">Fast gameplay loops, fair moderation, and detailed British-inspired services.
+    </p>
+    <div class="grid">
+      <article class="card reveal">
+        <h3>Professional Services</h3>
+        <p>Join Police, Ambulance, and more with structured training & ranks.</p>
+      </article>
+      <article class="card reveal" style="transition-delay:.05s">
+        <h3>Active Community</h3>
+        <p>Frequent patrols, community events, and transparent leadership.</p>
+      </article>
+      <article class="card reveal" style="transition-delay:.1s">
+        <h3>Optimised Performance</h3>
+        <p>Low-lag systems and accessible controls for new players.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- CTA STRIP -->
+  <section class="container">
+    <div class="card reveal" style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <h3 style="margin:0 0 6px 0">Want to help build Coventry?</h3>
+        <p class="muted" style="margin:0">We're recruiting for service leads, trainers, and community mods.</p>
+      </div>
+      <a class="btn primary" href="leadership.html">Meet the Team</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="brand" aria-hidden="true"><span class="logo"></span><span>Coventry Roleplay</span></div>
+      <div class="tiny">© <span id="year"></span> Coventry Roleplay • Unofficial fan content, not endorsed by Roblox.</div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile menu toggle
+    const toggle = document.querySelector('.menu-toggle');
+    const links = document.querySelector('.links');
+    toggle?.addEventListener('click', ()=>{
+      const open = links.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    // Reveal on scroll (adds .visible when in viewport)
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+    // Current year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

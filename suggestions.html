@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Coventry Roleplay — Suggestions</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Coventry Roleplay Home">
+        <img src="CV.png" alt="Police Service Logo" class="nav-logo" />
+        <span>Coventry Roleplay</span>
+      </a>
+      <button class="menu-toggle" aria-expanded="false" aria-controls="site-links">Menu</button>
+      <div id="site-links" class="links" role="menubar">
+        <a role="menuitem" href="index.html">Home</a>
+        <a role="menuitem" href="leadership.html">Leadership</a>
+        <a role="menuitem" href="services.html">Services</a>
+        <a role="menuitem" href="contact.html">Contact</a>
+        <a role="menuitem" class="active" href="suggestions.html">Suggestions</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero small">
+    <div class="hero-inner">
+      <h1 class="title reveal"><span class="grad">Suggestions</span></h1>
+      <p class="subtitle reveal">Got an idea? Submit your suggestions to help improve Coventry Roleplay.</p>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="card reveal" style="max-width:600px;margin:auto">
+      <form id="suggestionForm">
+        <label for="username">Roblox Username</label>
+        <input type="text" id="username" name="username" placeholder="Your Roblox Username" required />
+        
+        <label for="suggestion">Your Suggestion</label>
+        <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required></textarea>
+        
+        <button type="submit" class="btn primary">Submit Suggestion</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="brand" aria-hidden="true">
+        <span class="logo"></span>
+        <span>Coventry Roleplay</span>
+      </div>
+      <div class="tiny">© <span id="year"></span> Coventry Roleplay • Unofficial fan content, not endorsed by Roblox.</div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+<script>
+  // Handle suggestion submission to Discord webhook
+  document.getElementById('suggestionForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const username = document.getElementById('username').value;
+    const suggestion = document.getElementById('suggestion').value;
+
+    // Replace with your actual Discord webhook URL
+    const webhookURL = "https://discord.com/api/webhooks/1410316932913041489/D93VSFxs5oBlnLYhWYlyCMzaUdEcEeHsOjaWvXpjup2qm2wNqvWKTBXb36MCH_Y3jJg1";
+
+    fetch(webhookURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        embeds: [{
+          title: `Suggestion from ${username}`,
+          description: suggestion,
+          color: 0x00ff00 // optional: green color
+        }]
+      })
+    })
+    .then(res => {
+      if(res.ok) alert("Suggestion submitted successfully!");
+      else alert("Failed to submit suggestion.");
+    })
+    .catch(() => alert("Error sending suggestion."));
+  });
+
+  // Set the current year in the footer
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
