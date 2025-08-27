@@ -31,20 +31,19 @@
     </div>
   </section>
 
-  <section class="container">
-    <div class="card reveal" style="max-width:600px;margin:auto; padding:20px;">
-      <!-- Don't redirect away from this page -->
-      <form id="suggestionForm">
-        <label for="username">Roblox Username</label>
-        <input type="text" id="username" name="username" placeholder="Your Roblox Username" required />
-        
-        <label for="suggestion">Your Suggestion</label>
-        <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required></textarea>
-        
-        <button type="submit" class="btn primary">Submit Suggestion</button>
-      </form>
-    </div>
-  </section>
+<section class="container">
+  <div class="card reveal" style="max-width:600px;margin:auto; padding:20px; background:#fff; color:#000;">
+    <form id="suggestionForm">
+      <label for="username">Roblox Username</label><br>
+      <input type="text" id="username" name="username" placeholder="Your Roblox Username" required style="width:100%; padding:8px; margin-bottom:12px;" />
+      
+      <label for="suggestion">Your Suggestion</label><br>
+      <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required style="width:100%; padding:8px; margin-bottom:12px;"></textarea>
+      
+      <button type="submit" class="btn primary" style="padding:10px 20px;">Submit Suggestion</button>
+    </form>
+  </div>
+</section>
 
   <footer>
     <div class="footer-inner">
@@ -86,3 +85,4 @@
   </script>
 </body>
 </html>
+
