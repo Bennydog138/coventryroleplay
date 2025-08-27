@@ -31,19 +31,19 @@
     </div>
   </section>
 
-<section class="container">
-  <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#fff; color:#000;">
-    <form id="suggestionForm">
-      <label for="username">Roblox Username</label><br>
-      <input type="text" id="username" name="username" placeholder="Your Roblox Username" required style="width:100%; padding:8px; margin-bottom:12px;" />
-      
-      <label for="suggestion">Your Suggestion</label><br>
-      <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required style="width:100%; padding:8px; margin-bottom:12px;"></textarea>
-      
-      <button type="submit" class="btn primary" style="padding:10px 20px;">Submit Suggestion</button>
-    </form>
-  </div>
-</section>
+  <section class="container">
+    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#fff; color:#000;">
+      <form id="suggestionForm">
+        <label for="username">Roblox Username</label><br>
+        <input type="text" id="username" name="username" placeholder="Your Roblox Username" required style="width:100%; padding:8px; margin-bottom:12px;" />
+        
+        <label for="suggestion">Your Suggestion</label><br>
+        <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required style="width:100%; padding:8px; margin-bottom:12px;"></textarea>
+        
+        <button type="submit" class="btn primary" style="padding:10px 20px;">Submit Suggestion</button>
+      </form>
+    </div>
+  </section>
 
   <footer>
     <div class="footer-inner">
@@ -56,27 +56,34 @@
   </footer>
 
   <script>
-    // Handle form submission with fetch instead of redirect
+    // Handle form submission with JSON payload
     document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
       e.preventDefault();
       const form = e.target;
-      const data = new FormData(form);
+
+      const payload = {
+        username: form.username.value,
+        suggestion: form.suggestion.value
+      };
 
       try {
         const res = await fetch("https://backend.harryroblox138.repl.co/suggest", {
           method: "POST",
-          body: data
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
         });
 
-        if (res.ok) {
-          alert("Suggestion submitted successfully!");
+        const result = await res.json();
+
+        if (res.ok && result.success) {
+          alert("✅ Suggestion submitted successfully!");
           form.reset();
         } else {
-          alert("Failed to submit suggestion.");
+          alert("❌ Failed to submit suggestion: " + (result.error || "Unknown error"));
         }
       } catch (err) {
         console.error(err);
-        alert("Error sending suggestion.");
+        alert("⚠️ Error sending suggestion.");
       }
     });
 
@@ -85,6 +92,3 @@
   </script>
 </body>
 </html>
-
-
-
