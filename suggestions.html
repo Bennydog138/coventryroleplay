@@ -31,19 +31,25 @@
     </div>
   </section>
 
-  <section class="container">
-    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#fff; color:#000;">
-      <form id="suggestionForm">
-        <label for="username">Roblox Username</label><br>
-        <input type="text" id="username" name="username" placeholder="Your Roblox Username" required style="width:100%; padding:8px; margin-bottom:12px;" />
-        
-        <label for="suggestion">Your Suggestion</label><br>
-        <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required style="width:100%; padding:8px; margin-bottom:12px;"></textarea>
-        
-        <button type="submit" class="btn primary" style="padding:10px 20px;">Submit Suggestion</button>
-      </form>
-    </div>
-  </section>
+<section class="container">
+  <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+    <form id="suggestionForm">
+      <label for="username" style="display:block; margin-bottom:6px; font-weight:bold;">Roblox Username</label>
+      <input type="text" id="username" name="username" placeholder="Your Roblox Username" required 
+        style="width:100%; padding:10px; margin-bottom:15px; border:none; border-radius:8px; background:#2a2a3d; color:#fff;" />
+      
+      <label for="suggestion" style="display:block; margin-bottom:6px; font-weight:bold;">Your Suggestion</label>
+      <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required 
+        style="width:100%; padding:10px; margin-bottom:15px; border:none; border-radius:8px; background:#2a2a3d; color:#fff;"></textarea>
+      
+      <button type="submit" class="btn primary" 
+        style="padding:12px 20px; width:100%; border:none; border-radius:8px; font-weight:bold;
+               background:linear-gradient(90deg,#007bff,#6610f2); color:white; cursor:pointer;">
+        Submit Suggestion
+      </button>
+    </form>
+  </div>
+</section>
 
   <footer>
     <div class="footer-inner">
@@ -92,4 +98,5 @@
   </script>
 </body>
 </html>
+
 
