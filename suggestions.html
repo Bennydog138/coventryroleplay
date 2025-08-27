@@ -30,8 +30,17 @@
       <p class="subtitle reveal">Got an idea? Submit your suggestions to help improve Coventry Roleplay.</p>
     </div>
   </section>
+
 <section class="container">
   <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+    
+    <!-- Privacy Notice -->
+    <div style="margin-bottom:15px; background:#2a2a3d; padding:10px; border-radius:8px; font-size:0.9em; color:#ccc;">
+      <strong>Privacy Notice:</strong> When you submit a suggestion, we log your IP address along with your submission to help prevent abuse.
+      We only use this for security and moderation purposes. Inappropriate suggestions may result in being blocked from future submissions.
+      For more information, please see our <a href="privacy.html" style="color:#66b3ff;">Privacy Policy</a>.
+    </div>
+
     <form id="suggestionForm">
       <label for="username" style="display:block; margin-bottom:6px; font-weight:bold;">Roblox Username</label>
       <input type="text" id="username" name="username" placeholder="Your Roblox Username" required 
@@ -41,20 +50,20 @@
       <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required 
         style="width:100%; padding:10px; margin-bottom:15px; border:none; border-radius:8px; background:#2a2a3d; color:#fff;"></textarea>
       
-      <button type="submit" class="btn primary" 
+      <!-- Consent checkbox -->
+      <label style="display:block; margin-bottom:15px; font-size:0.9em;">
+        <input type="checkbox" id="consentCheckbox" /> I agree to the privacy notice and consent to my IP being logged for moderation purposes.
+      </label>
+
+      <button type="submit" id="submitBtn" class="btn primary" disabled
         style="padding:12px 20px; width:100%; border:none; border-radius:8px; font-weight:bold;
                background:linear-gradient(90deg,#007bff,#6610f2); color:white; cursor:pointer;">
         Submit Suggestion
       </button>
     </form>
-
-    <!-- Add this disclaimer below the form -->
-    <p style="margin-top:15px; font-size:0.9em; color:#ccc;">
-      <strong>Notice:</strong> Every suggestion you send is logged along with your IP address. 
-      Inappropriate suggestions may result in being blocked from submitting in the future.
-    </p>
   </div>
 </section>
+
   <footer>
     <div class="footer-inner">
       <div class="brand" aria-hidden="true">
@@ -66,9 +75,20 @@
   </footer>
 
   <script>
+    // Enable submit only if consent is checked
+    const consentCheckbox = document.getElementById("consentCheckbox");
+    const submitBtn = document.getElementById("submitBtn");
+    consentCheckbox.addEventListener("change", function() {
+      submitBtn.disabled = !this.checked;
+    });
+
     // Handle form submission with JSON payload
     document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
       e.preventDefault();
+      if (!consentCheckbox.checked) {
+        alert("You must agree to the privacy notice to submit a suggestion.");
+        return;
+      }
       const form = e.target;
 
       const payload = {
@@ -88,6 +108,8 @@
         if (res.ok && result.success) {
           alert("✅ Suggestion submitted successfully!");
           form.reset();
+          submitBtn.disabled = true; // reset consent checkbox too
+          consentCheckbox.checked = false;
         } else {
           alert("❌ Failed to submit suggestion: " + (result.error || "Unknown error"));
         }
@@ -102,6 +124,3 @@
   </script>
 </body>
 </html>
-
-
-
