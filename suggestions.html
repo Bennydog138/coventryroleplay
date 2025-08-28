@@ -1,103 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Coventry Roleplay — Suggestions</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    .suggest-card {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-      background: #1e1e2f;
-      color: #fff;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    label {
-      display: block;
-      margin: 10px 0 5px;
-      font-weight: bold;
-    }
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      border-radius: 8px;
-      border: none;
-      margin-bottom: 15px;
-      background: #2a2a40;
-      color: #fff;
-    }
-    textarea {
-      resize: vertical;
-    }
-    button {
-      background: #5865F2;
-      color: #fff;
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
-    button:hover {
-      background: #4752c4;
-    }
-  </style>
 </head>
 <body>
-  <header> ... same header as before ... </header>
+  <!-- HEADER -->
+  <header>
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="index.html" aria-label="Coventry Roleplay Home">
+        <img src="CV.png" alt="Police Service Logo" class="nav-logo" />
+        <span>Coventry Roleplay</span>
+      </a>
+      <button class="menu-toggle" aria-expanded="false" aria-controls="site-links">Menu</button>
+      <div id="site-links" class="links" role="menubar">
+        <a role="menuitem" href="index.html">Home</a>
+        <a role="menuitem" href="leadership.html">Leadership</a>
+        <a role="menuitem" href="services.html">Services</a>
+        <a role="menuitem" href="contact.html">Contact</a>
+        <a role="menuitem" class="active" href="suggestions.html">Suggestions</a>
+      </div>
+    </nav>
+  </header>
 
+  <!-- HERO -->
+  <section class="hero small">
+    <div class="hero-inner">
+      <h1 class="title reveal"><span class="grad">Suggestions</span></h1>
+      <p class="subtitle reveal">Got an idea? Submit your suggestions to help improve Coventry Roleplay.</p>
+    </div>
+  </section>
+
+  <!-- FORM -->
   <section class="container">
-    <div class="suggest-card">
-      <h2 style="text-align:center; margin-bottom: 16px;">Submit a Suggestion</h2>
+    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
       <form id="suggestionForm">
-        <label for="username">Your Name</label>
-        <input id="username" type="text" placeholder="Enter your name (or Anonymous)" />
-
-        <label for="suggestion">Your Suggestion</label>
-        <textarea id="suggestion" rows="5" required></textarea>
-
-        <button type="submit">Submit Suggestion</button>
+        <label for="username">Roblox Username</label><br>
+        <input type="text" id="username" name="username" placeholder="Your Roblox Username" required style="width:100%; padding:8px; margin-bottom:12px; border-radius:6px; border:none; background:#2b2b3c; color:#fff;" />
+        
+        <label for="suggestion">Your Suggestion</label><br>
+        <textarea id="suggestion" name="suggestion" rows="5" placeholder="Enter your suggestion here..." required style="width:100%; padding:8px; margin-bottom:12px; border-radius:6px; border:none; background:#2b2b3c; color:#fff;"></textarea>
+        
+        <button type="submit" style="padding:10px 20px; background:#5865F2; color:#fff; border:none; border-radius:8px; cursor:pointer;">Submit Suggestion</button>
       </form>
     </div>
   </section>
 
-<script>
-const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev"; // your backend
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="brand" aria-hidden="true">
+        <span class="logo"></span>
+        <span>Coventry Roleplay</span>
+      </div>
+      <div class="tiny">© <span id="year"></span> Coventry Roleplay • Unofficial fan content, not endorsed by Roblox.</div>
+    </div>
+  </footer>
 
-document.getElementById("suggestionForm").addEventListener("submit", async (e) => {
-  e.preventDefault();
+  <!-- SCRIPT -->
+  <script>
+    document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {
+        username: document.getElementById("username").value.trim(),
+        suggestion: document.getElementById("suggestion").value.trim()
+      };
 
-  const username = document.getElementById("username").value.trim() || "Anonymous";
-  const suggestion = document.getElementById("suggestion").value.trim();
+      try {
+        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/suggest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
 
-  if (!suggestion) {
-    alert("⚠️ Please write a suggestion.");
-    return;
-  }
-
-  try {
-    const res = await fetch(`${backendBase}/suggest`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, suggestion })
+        const json = await res.json();
+        if (res.ok && json.success) {
+          alert("✅ Suggestion submitted successfully!");
+          form.reset();
+        } else {
+          alert("❌ Failed: " + (json.error || "Unknown error"));
+        }
+      } catch (err) {
+        console.error(err);
+        alert("⚠️ Error sending suggestion.");
+      }
     });
 
-    const json = await res.json();
-
-    if (res.ok && json.success) {
-      alert("✅ Suggestion submitted successfully!");
-      document.getElementById("suggestionForm").reset();
-    } else {
-      alert("❌ Failed: " + (json.error || "Unknown error"));
-    }
-  } catch (err) {
-    console.error(err);
-    alert("⚠️ Error sending suggestion.");
-  }
-});
-</script>
+    // Set the current year
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
