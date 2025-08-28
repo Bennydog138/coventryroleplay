@@ -5,159 +5,92 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Coventry Roleplay — Suggestions</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .suggest-card {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      background: #1e1e2f;
+      color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      background: #2a2a40;
+      color: #fff;
+    }
+    textarea {
+      resize: vertical;
+    }
+    button {
+      background: #5865F2;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    button:hover {
+      background: #4752c4;
+    }
+  </style>
 </head>
 <body>
   <header> ... same header as before ... </header>
 
   <section class="container">
-    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
-      <div id="authArea" style="text-align:center; margin-bottom:16px;">
-        <p id="authStatus">Checking login status...</p>
-        <button id="loginBtn" style="background:#5865F2;color:#fff;padding:10px 15px;border-radius:8px;border:none;cursor:pointer;display:none;">
-          Login with Discord
-        </button>
-        <button id="logoutBtn" style="background:#ff4d4d;color:#fff;padding:10px 15px;border-radius:8px;border:none;cursor:pointer;display:none;">
-          Logout
-        </button>
-      </div>
+    <div class="suggest-card">
+      <h2 style="text-align:center; margin-bottom: 16px;">Submit a Suggestion</h2>
+      <form id="suggestionForm">
+        <label for="username">Your Name</label>
+        <input id="username" type="text" placeholder="Enter your name (or Anonymous)" />
 
-      <form id="suggestionForm" style="display:none;">
         <label for="suggestion">Your Suggestion</label>
         <textarea id="suggestion" rows="5" required></textarea>
+
         <button type="submit">Submit Suggestion</button>
       </form>
     </div>
   </section>
 
 <script>
-const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // REPLACE with your Replit backend URL
-const loginHref = `${backendBase}/login`;
-const FRONTEND_ORIGIN = window.location.origin; // should be https://coventryroleplay.co.uk
+const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev"; // your backend
 
-// helpers
-function setLoggedInUI(username) {
-  document.getElementById("authStatus").textContent = `Logged in as ${username}`;
-  document.getElementById("loginBtn").style.display = "none";
-  document.getElementById("logoutBtn").style.display = "inline-block";
-  document.getElementById("suggestionForm").style.display = "block";
-}
-function setLoggedOutUI() {
-  document.getElementById("authStatus").textContent = "You are not logged in.";
-  document.getElementById("loginBtn").style.display = "inline-block";
-  document.getElementById("logoutBtn").style.display = "none";
-  document.getElementById("suggestionForm").style.display = "none";
-}
-
-// check token in localStorage
-function getStoredToken() {
-  return localStorage.getItem("authToken");
-}
-function storeToken(t) {
-  localStorage.setItem("authToken", t);
-}
-function clearToken() {
-  localStorage.removeItem("authToken");
-}
-
-// decode JWT payload safely (no verification)
-function decodeJwtPayload(token) {
-  try {
-    const part = token.split(".")[1];
-    const str = atob(part.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(str);
-  } catch (e) {
-    return null;
-  }
-}
-
-// initialize UI based on token
-function initAuthUI() {
-  const token = getStoredToken();
-  if (!token) {
-    setLoggedOutUI();
-    return;
-  }
-  const payload = decodeJwtPayload(token);
-  if (!payload) {
-    clearToken();
-    setLoggedOutUI();
-    return;
-  }
-  setLoggedInUI(payload.username || "Unknown");
-}
-
-// LOGIN popup flow
-const loginBtn = document.getElementById("loginBtn");
-loginBtn.addEventListener("click", () => {
-  // open popup centered
-  const w = 600, h = 700;
-  const left = (screen.width / 2) - (w / 2);
-  const top = (screen.height / 2) - (h / 2);
-  const popup = window.open(loginHref, "discord_login", `width=${w},height=${h},left=${left},top=${top}`);
-
-  // listen for message from popup (postMessage)
-  function onMessage(e) {
-    if (e.origin !== FRONTEND_ORIGIN) {
-      // ignore messages not from our frontend origin
-      // Note: callback HTML posts message with targetOrigin = FRONTEND_ORIGIN set by backend,
-      // and the browser will set e.origin to FRONTEND_ORIGIN here.
-      return;
-    }
-    const data = e.data || {};
-    if (data.banned) {
-      alert("You are banned from submitting suggestions.");
-      window.removeEventListener("message", onMessage);
-      if (popup && !popup.closed) popup.close();
-      return;
-    }
-    if (data.token) {
-      storeToken(data.token);
-      initAuthUI();
-    }
-    window.removeEventListener("message", onMessage);
-    if (popup && !popup.closed) popup.close();
-  }
-  window.addEventListener("message", onMessage);
-});
-
-// LOGOUT
-document.getElementById("logoutBtn").addEventListener("click", () => {
-  clearToken();
-  initAuthUI();
-});
-
-// SUGGESTION submit
 document.getElementById("suggestionForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const token = getStoredToken();
-  if (!token) {
-    alert("Please login first.");
-    return;
-  }
+
+  const username = document.getElementById("username").value.trim() || "Anonymous";
   const suggestion = document.getElementById("suggestion").value.trim();
+
   if (!suggestion) {
-    alert("Please write a suggestion.");
+    alert("⚠️ Please write a suggestion.");
     return;
   }
+
   try {
     const res = await fetch(`${backendBase}/suggest`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({ suggestion })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, suggestion })
     });
+
     const json = await res.json();
+
     if (res.ok && json.success) {
       alert("✅ Suggestion submitted successfully!");
       document.getElementById("suggestionForm").reset();
     } else {
-      if (json.error && json.error.toLowerCase().includes("invalid")) {
-        // token invalid/expired: clear it
-        clearToken();
-        initAuthUI();
-      }
       alert("❌ Failed: " + (json.error || "Unknown error"));
     }
   } catch (err) {
@@ -165,22 +98,6 @@ document.getElementById("suggestionForm").addEventListener("submit", async (e) =
     alert("⚠️ Error sending suggestion.");
   }
 });
-
-// If the user was redirected back with token in URL (fallback), capture it:
-(function checkUrlTokenFallback() {
-  const params = new URLSearchParams(window.location.search);
-  const t = params.get("token");
-  if (t) {
-    storeToken(t);
-    // remove token param from URL
-    const url = new URL(window.location.href);
-    url.searchParams.delete("token");
-    window.history.replaceState({}, document.title, url.pathname + url.search);
-  }
-})();
-
-// init
-initAuthUI();
 </script>
 </body>
 </html>
