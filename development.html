@@ -67,7 +67,6 @@
   </footer>
 
   <script>
-    // Set the current year
     document.getElementById("year").textContent = new Date().getFullYear();
 
     // Fetch updates
@@ -95,6 +94,41 @@
             html += `<img src="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/updates_images/${u.image}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
           }
           div.innerHTML = html;
+
+          // Add Delete button
+          const delBtn = document.createElement("button");
+          delBtn.textContent = "Delete";
+          delBtn.style.marginTop = "10px";
+          delBtn.style.background = "#e74c3c";
+          delBtn.style.color = "#fff";
+          delBtn.style.border = "none";
+          delBtn.style.padding = "6px 10px";
+          delBtn.style.borderRadius = "6px";
+          delBtn.style.cursor = "pointer";
+
+          delBtn.onclick = async () => {
+            const pwd = prompt("Enter admin password to delete this update:");
+            if (!pwd) return;
+            try {
+              const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/api/delete_update", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ password: pwd, title: u.title })
+              });
+              const result = await res.json();
+              if (result.success) {
+                alert("✅ Update deleted!");
+                fetchUpdates();
+              } else {
+                alert("❌ " + (result.error || "Failed to delete"));
+              }
+            } catch (err) {
+              console.error(err);
+              alert("⚠️ Error deleting update.");
+            }
+          };
+
+          div.appendChild(delBtn);
           container.appendChild(div);
         });
       } catch (err) {
