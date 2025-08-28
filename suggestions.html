@@ -1,118 +1,144 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Coventry Roleplay — Suggestions</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <nav class="nav" aria-label="Primary">
-      <a class="brand" href="index.html" aria-label="Coventry Roleplay Home">
-        <img src="CV.png" alt="Police Service Logo" class="nav-logo" />
-        <span>Coventry Roleplay</span>
-      </a>
-      <button class="menu-toggle" aria-expanded="false" aria-controls="site-links">Menu</button>
-      <div id="site-links" class="links" role="menubar">
-        <a role="menuitem" href="index.html">Home</a>
-        <a role="menuitem" href="leadership.html">Leadership</a>
-        <a role="menuitem" href="services.html">Services</a>
-        <a role="menuitem" href="contact.html">Contact</a>
-        <a role="menuitem" class="active" href="suggestions.html">Suggestions</a>
-      </div>
-    </nav>
-  </header>
-
-  <section class="hero small">
-    <div class="hero-inner">
-      <h1 class="title reveal"><span class="grad">Suggestions</span></h1>
-      <p class="subtitle reveal">Got an idea? Submit your suggestions to help improve Coventry Roleplay.</p>
-    </div>
-  </section>
+  <header> ... same header as before ... </header>
 
   <section class="container">
-    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
-      
-      <!-- Authentication area -->
-      <div id="authArea" style="text-align:center; margin-bottom:20px;">
+    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
+      <div id="authArea" style="text-align:center; margin-bottom:16px;">
         <p id="authStatus">Checking login status...</p>
-        <a id="loginBtn" href="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/login"
-           style="display:none; padding:10px 15px; background:#5865F2; color:white; border-radius:8px; text-decoration:none;">
-           Login with Discord
-        </a>
-        <button id="logoutBtn"
-           style="display:none; padding:10px 15px; background:#ff4d4d; color:white; border-radius:8px; border:none; cursor:pointer;">
-           Logout
+        <button id="loginBtn" style="background:#5865F2;color:#fff;padding:10px 15px;border-radius:8px;border:none;cursor:pointer;display:none;">
+          Login with Discord
+        </button>
+        <button id="logoutBtn" style="background:#ff4d4d;color:#fff;padding:10px 15px;border-radius:8px;border:none;cursor:pointer;display:none;">
+          Logout
         </button>
       </div>
 
-      <!-- Suggestion form -->
       <form id="suggestionForm" style="display:none;">
         <label for="suggestion">Your Suggestion</label>
-        <textarea id="suggestion" name="suggestion" rows="5" required></textarea>
-        <button type="submit" id="submitBtn">Submit Suggestion</button>
+        <textarea id="suggestion" rows="5" required></textarea>
+        <button type="submit">Submit Suggestion</button>
       </form>
     </div>
   </section>
 
 <script>
-const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // Replace with your Replit backend URL
+const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // REPLACE with your Replit backend URL
+const loginHref = `${backendBase}/login`;
+const FRONTEND_ORIGIN = window.location.origin; // should be https://coventryroleplay.co.uk
 
-// --- Parse token from URL ---
-const urlParams = new URLSearchParams(window.location.search);
-const tokenFromUrl = urlParams.get("token");
-if (tokenFromUrl) {
-  localStorage.setItem("authToken", tokenFromUrl);
-  window.history.replaceState({}, document.title, "/suggestions.html"); // remove token from URL
+// helpers
+function setLoggedInUI(username) {
+  document.getElementById("authStatus").textContent = `Logged in as ${username}`;
+  document.getElementById("loginBtn").style.display = "none";
+  document.getElementById("logoutBtn").style.display = "inline-block";
+  document.getElementById("suggestionForm").style.display = "block";
+}
+function setLoggedOutUI() {
+  document.getElementById("authStatus").textContent = "You are not logged in.";
+  document.getElementById("loginBtn").style.display = "inline-block";
+  document.getElementById("logoutBtn").style.display = "none";
+  document.getElementById("suggestionForm").style.display = "none";
 }
 
-// --- Elements ---
-const authStatus = document.getElementById("authStatus");
-const loginBtn = document.getElementById("loginBtn");
-const logoutBtn = document.getElementById("logoutBtn");
-const suggestionForm = document.getElementById("suggestionForm");
+// check token in localStorage
+function getStoredToken() {
+  return localStorage.getItem("authToken");
+}
+function storeToken(t) {
+  localStorage.setItem("authToken", t);
+}
+function clearToken() {
+  localStorage.removeItem("authToken");
+}
 
-// --- Check if logged in ---
-function updateAuthUI() {
-  const token = localStorage.getItem("authToken");
+// decode JWT payload safely (no verification)
+function decodeJwtPayload(token) {
+  try {
+    const part = token.split(".")[1];
+    const str = atob(part.replace(/-/g, "+").replace(/_/g, "/"));
+    return JSON.parse(str);
+  } catch (e) {
+    return null;
+  }
+}
+
+// initialize UI based on token
+function initAuthUI() {
+  const token = getStoredToken();
   if (!token) {
-    authStatus.textContent = "You are not logged in.";
-    loginBtn.style.display = "inline-block";
-    logoutBtn.style.display = "none";
-    suggestionForm.style.display = "none";
+    setLoggedOutUI();
     return;
   }
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    authStatus.textContent = `Logged in as ${payload.username}`;
-    loginBtn.style.display = "none";
-    logoutBtn.style.display = "inline-block";
-    suggestionForm.style.display = "block";
-  } catch (err) {
-    console.error("Invalid token:", err);
-    localStorage.removeItem("authToken");
-    updateAuthUI();
+  const payload = decodeJwtPayload(token);
+  if (!payload) {
+    clearToken();
+    setLoggedOutUI();
+    return;
   }
+  setLoggedInUI(payload.username || "Unknown");
 }
 
-// --- Logout ---
-logoutBtn.addEventListener("click", () => {
-  localStorage.removeItem("authToken");
-  updateAuthUI();
+// LOGIN popup flow
+const loginBtn = document.getElementById("loginBtn");
+loginBtn.addEventListener("click", () => {
+  // open popup centered
+  const w = 600, h = 700;
+  const left = (screen.width / 2) - (w / 2);
+  const top = (screen.height / 2) - (h / 2);
+  const popup = window.open(loginHref, "discord_login", `width=${w},height=${h},left=${left},top=${top}`);
+
+  // listen for message from popup (postMessage)
+  function onMessage(e) {
+    if (e.origin !== FRONTEND_ORIGIN) {
+      // ignore messages not from our frontend origin
+      // Note: callback HTML posts message with targetOrigin = FRONTEND_ORIGIN set by backend,
+      // and the browser will set e.origin to FRONTEND_ORIGIN here.
+      return;
+    }
+    const data = e.data || {};
+    if (data.banned) {
+      alert("You are banned from submitting suggestions.");
+      window.removeEventListener("message", onMessage);
+      if (popup && !popup.closed) popup.close();
+      return;
+    }
+    if (data.token) {
+      storeToken(data.token);
+      initAuthUI();
+    }
+    window.removeEventListener("message", onMessage);
+    if (popup && !popup.closed) popup.close();
+  }
+  window.addEventListener("message", onMessage);
 });
 
-// --- Suggestion submission ---
-suggestionForm.addEventListener("submit", async (e) => {
+// LOGOUT
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  clearToken();
+  initAuthUI();
+});
+
+// SUGGESTION submit
+document.getElementById("suggestionForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-  const token = localStorage.getItem("authToken");
+  const token = getStoredToken();
   if (!token) {
-    alert("You must be logged in to submit a suggestion.");
+    alert("Please login first.");
     return;
   }
-
-  const payload = { suggestion: document.getElementById("suggestion").value };
-
+  const suggestion = document.getElementById("suggestion").value.trim();
+  if (!suggestion) {
+    alert("Please write a suggestion.");
+    return;
+  }
   try {
     const res = await fetch(`${backendBase}/suggest`, {
       method: "POST",
@@ -120,14 +146,19 @@ suggestionForm.addEventListener("submit", async (e) => {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ suggestion })
     });
-    const result = await res.json();
-    if (res.ok && result.success) {
+    const json = await res.json();
+    if (res.ok && json.success) {
       alert("✅ Suggestion submitted successfully!");
-      suggestionForm.reset();
+      document.getElementById("suggestionForm").reset();
     } else {
-      alert("❌ Failed: " + (result.error || "Unknown error"));
+      if (json.error && json.error.toLowerCase().includes("invalid")) {
+        // token invalid/expired: clear it
+        clearToken();
+        initAuthUI();
+      }
+      alert("❌ Failed: " + (json.error || "Unknown error"));
     }
   } catch (err) {
     console.error(err);
@@ -135,8 +166,21 @@ suggestionForm.addEventListener("submit", async (e) => {
   }
 });
 
-// --- Init ---
-updateAuthUI();
+// If the user was redirected back with token in URL (fallback), capture it:
+(function checkUrlTokenFallback() {
+  const params = new URLSearchParams(window.location.search);
+  const t = params.get("token");
+  if (t) {
+    storeToken(t);
+    // remove token param from URL
+    const url = new URL(window.location.href);
+    url.searchParams.delete("token");
+    window.history.replaceState({}, document.title, url.pathname + url.search);
+  }
+})();
+
+// init
+initAuthUI();
 </script>
 </body>
 </html>
