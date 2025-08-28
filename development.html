@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- HEADER -->
   <header>
     <nav class="nav" aria-label="Primary">
       <a class="brand" href="index.html" aria-label="Coventry Roleplay Home">
@@ -19,52 +20,42 @@
         <a role="menuitem" href="leadership.html">Leadership</a>
         <a role="menuitem" href="services.html">Services</a>
         <a role="menuitem" href="contact.html">Contact</a>
-        <a role="menuitem" href="suggestions.html">Suggestions</a>
-        <a role="menuitem" href="development.html">Development</a>
+        <a role="menuitem" class="active" href="development.html">Development</a>
       </div>
     </nav>
   </header>
 
-  <!-- ADMIN ACCESS -->
-  <section class="container" style="max-width:800px;margin:40px auto;">
-    <div class="card" style="padding:20px;background:#1e1e2f;border-radius:12px;">
-      <h2 style="color:#9b59b6;">Admin Access</h2>
-      <input type="password" id="adminKey" placeholder="Enter Admin Key" style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
-      <button id="unlockAdmin" style="width:100%;padding:10px;background:#5865F2;color:#fff;font-weight:bold;border:none;border-radius:6px;cursor:pointer;">Unlock Admin Form</button>
-      <p id="adminMessage" style="margin-top:10px;color:#ff6b6b;"></p>
+  <!-- HERO -->
+  <section class="hero small">
+    <div class="hero-inner">
+      <h1 class="title reveal"><span class="grad">Development Updates</span></h1>
+      <p class="subtitle reveal">Stay up to date with the weekly progress on Coventry Roleplay.</p>
     </div>
   </section>
 
-  <!-- ADD DEVELOPMENT UPDATE -->
-  <section class="container" style="max-width:800px;margin:20px auto;">
+  <!-- UPDATES LIST -->
+  <section class="container" id="updates-container" style="max-width:800px;margin:auto;">
+    <div class="card" style="padding:20px;background:#1e1e2f;color:#fff;border-radius:12px;">
+      <p>Loading updates...</p>
+    </div>
+  </section>
+
+  <!-- ADMIN FORM -->
+  <section class="container" style="max-width:800px;margin:40px auto;">
     <div class="card" style="padding:20px;background:#1e1e2f;border-radius:12px;">
-      <h2>Add Development Update</h2>
-      <form id="updateForm">
-        <label>Admin Password</label><br>
-        <input type="password" name="password" required style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;" disabled />
-
-        <label>Title</label><br>
-        <input type="text" name="title" required style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;" />
-
-        <label>Date (YYYY-MM-DD)</label><br>
-        <input type="text" name="date" required style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;" />
-
-        <label>Content</label><br>
-        <textarea name="content" rows="5" required style="width:100%;padding:8px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;"></textarea>
-
-        <label>Image (optional)</label><br>
-        <input type="file" name="image" style="margin-bottom:10px;" />
-
-        <button type="submit" style="padding:10px 20px; background:#5865F2; color:#fff; border:none; border-radius:8px; cursor:pointer;" disabled>Add Update</button>
+      <h2 style="color:#9b59b6;">Add Update (Admin)</h2>
+      <form id="updateForm" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Title" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+        <input type="date" name="date" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+        <textarea name="content" placeholder="Content" rows="4" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;"></textarea>
+        <input type="file" name="image" accept="image/*" style="margin-bottom:10px;">
+        <input type="password" name="password" placeholder="Admin Password" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+        <button type="submit" style="width:100%;padding:10px;background:#5865F2;color:#fff;font-weight:bold;border:none;border-radius:6px;cursor:pointer;">Submit Update</button>
       </form>
     </div>
   </section>
 
-  <!-- DEVELOPMENT UPDATES LIST -->
-  <section class="container" style="max-width:800px;margin:20px auto;">
-    <div id="updatesList"></div>
-  </section>
-
+  <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
       <div class="brand" aria-hidden="true">
@@ -76,104 +67,66 @@
   </footer>
 
   <script>
+    // Set the current year
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const adminKeyInput = document.getElementById("adminKey");
-    const unlockButton = document.getElementById("unlockAdmin");
-    const adminMessage = document.getElementById("adminMessage");
-    let adminKey = "";
-
-    // Unlock admin actions
-    unlockButton.addEventListener("click", () => {
-      const key = adminKeyInput.value.trim();
-      if (!key) {
-        adminMessage.textContent = "Please enter a key!";
-        return;
-      }
-      adminKey = key;
-
-      // Enable password fields and buttons
-      const adminForms = document.querySelectorAll("form input[name='password']");
-      adminForms.forEach(input => { input.value = adminKey; input.disabled = false; });
-      const buttons = document.querySelectorAll("form button");
-      buttons.forEach(btn => btn.disabled = false);
-
-      adminMessage.style.color = "#2ecc71";
-      adminMessage.textContent = "Admin key set! You can now add or delete updates.";
-    });
-
-    // Submit new update
-    document.getElementById("updateForm").addEventListener("submit", async function(e){
-      e.preventDefault();
-      const form = e.target;
-      const data = new FormData(form);
-
+    // Fetch updates
+    async function fetchUpdates() {
+      const container = document.getElementById("updates-container");
+      container.innerHTML = '';
       try {
-        const res = await fetch("/api/add_update", { method: "POST", body: data });
-        const json = await res.json();
-        if (res.ok && json.success) {
-          alert("✅ Update added successfully!");
-          form.reset();
-          loadUpdates();
-        } else {
-          alert("❌ Failed: " + (json.error || "Unknown error"));
+        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/api/updates");
+        const updates = await res.json();
+        if (!updates.length) {
+          container.innerHTML = '<p>No updates yet.</p>';
+          return;
         }
+        updates.forEach(u => {
+          const div = document.createElement("div");
+          div.className = "card";
+          div.style.marginBottom = "20px";
+          div.style.background = "#1e1e2f";
+          div.style.color = "#fff";
+          div.style.padding = "15px";
+          div.style.borderRadius = "12px";
+
+          let html = `<h2>${u.title}</h2><p><em>${u.date}</em></p><p>${u.content}</p>`;
+          if (u.image) {
+            html += `<img src="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/updates_images/${u.image}" style="max-width:100%;margin-top:10px;border-radius:8px;">`;
+          }
+          div.innerHTML = html;
+          container.appendChild(div);
+        });
       } catch (err) {
         console.error(err);
-        alert("⚠️ Error sending update.");
+        container.innerHTML = '<p>Failed to load updates.</p>';
       }
-    });
-
-    // Load updates from backend
-    async function loadUpdates() {
-      const res = await fetch("/api/updates");
-      const updates = await res.json();
-      const container = document.getElementById("updatesList");
-      container.innerHTML = "";
-
-      updates.forEach((u, index) => {
-        const card = document.createElement("div");
-        card.className = "card";
-        card.style = "padding:20px;background:#2b2b3c;color:#fff;margin-bottom:10px;border-radius:12px;";
-        card.innerHTML = `
-          <h3>${u.title}</h3>
-          <small>${u.date}</small>
-          <p>${u.content}</p>
-          ${u.image ? `<img src="/updates_images/${u.image}" style="max-width:100%;margin-top:10px;border-radius:8px;">` : ""}
-          <button data-index="${index}" style="padding:5px 10px;background:#e74c3c;color:#fff;border:none;border-radius:6px;cursor:pointer;">Delete</button>
-        `;
-        container.appendChild(card);
-      });
-
-      // Delete button functionality
-      container.querySelectorAll("button").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          if (!adminKey) { alert("⚠️ Enter the admin key first!"); return; }
-          const idx = btn.getAttribute("data-index");
-          const password = adminKey;
-
-          try {
-            const res = await fetch("/api/delete_update", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ index: parseInt(idx), password })
-            });
-            const json = await res.json();
-            if (res.ok && json.success) {
-              alert("✅ Update deleted!");
-              loadUpdates();
-            } else {
-              alert("❌ Failed: " + (json.error || "Unknown error"));
-            }
-          } catch (err) {
-            console.error(err);
-            alert("⚠️ Error deleting update.");
-          }
-        });
-      });
     }
 
-    loadUpdates();
+    fetchUpdates();
+
+    // Admin form submission
+    document.getElementById("updateForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/api/add_update", {
+          method: "POST",
+          body: formData
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert("✅ Update added successfully!");
+          e.target.reset();
+          fetchUpdates(); // reload updates after adding
+        } else {
+          alert("❌ Error: " + (json.error || "Unknown error"));
+        }
+      } catch(err) {
+        console.error(err);
+        alert("⚠️ Failed to add update.");
+      }
+    });
   </script>
 </body>
 </html>
