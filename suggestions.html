@@ -41,19 +41,17 @@
            style="display:none; padding:10px 15px; background:#5865F2; color:white; border-radius:8px; text-decoration:none;">
            Login with Discord
         </a>
-        <a id="logoutBtn" href="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/logout"
-           style="display:none; padding:10px 15px; background:#ff4d4d; color:white; border-radius:8px; text-decoration:none;">
+        <button id="logoutBtn"
+           style="display:none; padding:10px 15px; background:#ff4d4d; color:white; border-radius:8px; border:none; cursor:pointer;">
            Logout
-        </a>
+        </button>
       </div>
 
       <!-- Suggestion form -->
       <form id="suggestionForm" style="display:none;">
         <label for="suggestion">Your Suggestion</label>
         <textarea id="suggestion" name="suggestion" rows="5" required></textarea>
-        <button type="submit" id="submitBtn">
-          Submit Suggestion
-        </button>
+        <button type="submit" id="submitBtn">Submit Suggestion</button>
       </form>
     </div>
   </section>
@@ -61,50 +59,73 @@
 <script>
 const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // Replace with your Replit backend URL
 
-// Check login status
-async function checkAuth() {
-  try {
-    const res = await fetch(`${backendBase}/whoami`, { credentials: "include" });
-    const data = await res.json();
+// --- Parse token from URL ---
+const urlParams = new URLSearchParams(window.location.search);
+const tokenFromUrl = urlParams.get("token");
+if (tokenFromUrl) {
+  localStorage.setItem("authToken", tokenFromUrl);
+  window.history.replaceState({}, document.title, "/suggestions.html"); // remove token from URL
+}
 
-    if (data.authenticated) {
-      document.getElementById("authStatus").textContent = `Logged in as ${data.user.username}`;
-      document.getElementById("loginBtn").style.display = "none";
-      document.getElementById("logoutBtn").style.display = "inline-block";
-      document.getElementById("suggestionForm").style.display = "block";
-    } else {
-      document.getElementById("authStatus").textContent = "You are not logged in.";
-      document.getElementById("loginBtn").style.display = "inline-block";
-      document.getElementById("logoutBtn").style.display = "none";
-      document.getElementById("suggestionForm").style.display = "none";
-    }
+// --- Elements ---
+const authStatus = document.getElementById("authStatus");
+const loginBtn = document.getElementById("loginBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const suggestionForm = document.getElementById("suggestionForm");
+
+// --- Check if logged in ---
+function updateAuthUI() {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    authStatus.textContent = "You are not logged in.";
+    loginBtn.style.display = "inline-block";
+    logoutBtn.style.display = "none";
+    suggestionForm.style.display = "none";
+    return;
+  }
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    authStatus.textContent = `Logged in as ${payload.username}`;
+    loginBtn.style.display = "none";
+    logoutBtn.style.display = "inline-block";
+    suggestionForm.style.display = "block";
   } catch (err) {
-    console.error("Auth check failed:", err);
-    document.getElementById("authStatus").textContent = "⚠️ Failed to check login.";
-    document.getElementById("loginBtn").style.display = "inline-block";
+    console.error("Invalid token:", err);
+    localStorage.removeItem("authToken");
+    updateAuthUI();
   }
 }
 
-// Handle suggestion submission
-document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
+// --- Logout ---
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("authToken");
+  updateAuthUI();
+});
 
-  const payload = {
-    suggestion: document.getElementById("suggestion").value
-  };
+// --- Suggestion submission ---
+suggestionForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    alert("You must be logged in to submit a suggestion.");
+    return;
+  }
+
+  const payload = { suggestion: document.getElementById("suggestion").value };
 
   try {
     const res = await fetch(`${backendBase}/suggest`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify(payload)
     });
     const result = await res.json();
-
     if (res.ok && result.success) {
       alert("✅ Suggestion submitted successfully!");
-      e.target.reset();
+      suggestionForm.reset();
     } else {
       alert("❌ Failed: " + (result.error || "Unknown error"));
     }
@@ -114,8 +135,8 @@ document.getElementById("suggestionForm").addEventListener("submit", async funct
   }
 });
 
-// Run auth check on page load
-checkAuth();
+// --- Init ---
+updateAuthUI();
 </script>
 </body>
 </html>
