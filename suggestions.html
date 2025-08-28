@@ -31,74 +31,83 @@
     </div>
   </section>
 
-<section class="container">
-  <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
-    <p style="margin-bottom:10px; font-size:14px;">
-      By submitting, you agree that we log your IP address for 30 days (longer if banned). 
-      <a href="privacy.html" target="_blank" style="color:#4da3ff;">Read our Privacy Policy</a>.
-    </p>
-    <form id="suggestionForm">
-      <label for="username">Roblox Username</label>
-      <input type="text" id="username" name="username" required />
+  <section class="container">
+    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+      
+      <!-- Auth UI -->
+      <div id="authArea" style="text-align:center; margin-bottom:20px;">
+        <p id="authStatus">Checking login status...</p>
+        <a id="loginBtn" href="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev//login" style="display:none; padding:10px 15px; background:#5865F2; color:white; border-radius:8px; text-decoration:none;">Login with Discord</a>
+        <a id="logoutBtn" href="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev//logout" style="display:none; padding:10px 15px; background:#ff4d4d; color:white; border-radius:8px; text-decoration:none;">Logout</a>
+      </div>
 
-      <label for="suggestion">Your Suggestion</label>
-      <textarea id="suggestion" name="suggestion" rows="5" required></textarea>
+      <!-- Suggestion form -->
+      <form id="suggestionForm" style="display:none;">
+        <label for="suggestion">Your Suggestion</label>
+        <textarea id="suggestion" name="suggestion" rows="5" required></textarea>
 
-      <label style="display:block; margin:10px 0;">
-        <input type="checkbox" id="consentCheckbox" /> 
-        I agree to the IP logging policy
-      </label>
-
-      <button type="submit" id="submitBtn" disabled>
-        Submit Suggestion
-      </button>
-    </form>
-  </div>
-</section>
+        <button type="submit" id="submitBtn">
+          Submit Suggestion
+        </button>
+      </form>
+    </div>
+  </section>
 
 <script>
-  const consentCheckbox = document.getElementById('consentCheckbox');
-  const submitBtn = document.getElementById('submitBtn');
+const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // 🔴 CHANGE THIS TO YOUR REPLIT BACKEND URL
 
-  consentCheckbox.addEventListener('change', () => {
-    submitBtn.disabled = !consentCheckbox.checked;
-  });
+async function checkAuth() {
+  try {
+    const res = await fetch(`${backendBase}/whoami`, { credentials: "include" });
+    const data = await res.json();
 
-  document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    if (!consentCheckbox.checked) {
-      alert("You must agree to our IP logging policy to submit.");
-      return;
+    if (data.authenticated) {
+      document.getElementById("authStatus").textContent = `Logged in as ${data.user.username}#${data.user.discriminator}`;
+      document.getElementById("loginBtn").style.display = "none";
+      document.getElementById("logoutBtn").style.display = "inline-block";
+      document.getElementById("suggestionForm").style.display = "block";
+    } else {
+      document.getElementById("authStatus").textContent = "You are not logged in.";
+      document.getElementById("loginBtn").style.display = "inline-block";
+      document.getElementById("logoutBtn").style.display = "none";
+      document.getElementById("suggestionForm").style.display = "none";
     }
+  } catch (err) {
+    console.error("Auth check failed:", err);
+    document.getElementById("authStatus").textContent = "⚠️ Failed to check login.";
+  }
+}
 
-    const form = e.target;
-    const payload = {
-      username: form.username.value,
-      suggestion: form.suggestion.value
-    };
+document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
 
-    try {
-      const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/suggest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const result = await res.json();
+  const payload = {
+    suggestion: document.getElementById("suggestion").value
+  };
 
-      if (res.ok && result.success) {
-        alert("✅ Suggestion submitted successfully!");
-        form.reset();
-        submitBtn.disabled = true; // reset consent
-      } else {
-        alert("❌ Failed: " + (result.error || "Unknown error"));
-      }
-    } catch (err) {
-      console.error(err);
-      alert("⚠️ Error sending suggestion.");
+  try {
+    const res = await fetch(`${backendBase}/suggest`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (res.ok && result.success) {
+      alert("✅ Suggestion submitted successfully!");
+      e.target.reset();
+    } else {
+      alert("❌ Failed: " + (result.error || "Unknown error"));
     }
-  });
+  } catch (err) {
+    console.error(err);
+    alert("⚠️ Error sending suggestion.");
+  }
+});
+
+// Run auth check on load
+checkAuth();
 </script>
 </body>
 </html>
-
-
