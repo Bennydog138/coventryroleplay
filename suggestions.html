@@ -34,18 +34,17 @@
   <section class="container">
     <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
       
-      <!-- Auth UI -->
+      <!-- Authentication area -->
       <div id="authArea" style="text-align:center; margin-bottom:20px;">
         <p id="authStatus">Checking login status...</p>
-        <a id="loginBtn" href="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev//login" style="display:none; padding:10px 15px; background:#5865F2; color:white; border-radius:8px; text-decoration:none;">Login with Discord</a>
-        <a id="logoutBtn" href="https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev//logout" style="display:none; padding:10px 15px; background:#ff4d4d; color:white; border-radius:8px; text-decoration:none;">Logout</a>
+        <a id="loginBtn" href="https://YOUR-BACKEND-URL.repl.co/login" style="display:none; padding:10px 15px; background:#5865F2; color:white; border-radius:8px; text-decoration:none;">Login with Discord</a>
+        <a id="logoutBtn" href="https://YOUR-BACKEND-URL.repl.co/logout" style="display:none; padding:10px 15px; background:#ff4d4d; color:white; border-radius:8px; text-decoration:none;">Logout</a>
       </div>
 
       <!-- Suggestion form -->
       <form id="suggestionForm" style="display:none;">
         <label for="suggestion">Your Suggestion</label>
         <textarea id="suggestion" name="suggestion" rows="5" required></textarea>
-
         <button type="submit" id="submitBtn">
           Submit Suggestion
         </button>
@@ -56,11 +55,10 @@
 <script>
 const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // 🔴 Replace with your Replit backend URL
 
+// Check login status
 async function checkAuth() {
   try {
-    const res = await fetch(`${backendBase}/whoami`, {
-      credentials: "include" // ✅ send cookies for session
-    });
+    const res = await fetch(`${backendBase}/whoami`, { credentials: "include" });
     const data = await res.json();
 
     if (data.authenticated) {
@@ -77,9 +75,11 @@ async function checkAuth() {
   } catch (err) {
     console.error("Auth check failed:", err);
     document.getElementById("authStatus").textContent = "⚠️ Failed to check login.";
+    document.getElementById("loginBtn").style.display = "inline-block";
   }
 }
 
+// Handle suggestion submission
 document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
@@ -91,7 +91,7 @@ document.getElementById("suggestionForm").addEventListener("submit", async funct
     const res = await fetch(`${backendBase}/suggest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include", // ✅ send cookies for session
+      credentials: "include",
       body: JSON.stringify(payload)
     });
     const result = await res.json();
@@ -106,11 +106,10 @@ document.getElementById("suggestionForm").addEventListener("submit", async funct
     console.error(err);
     alert("⚠️ Error sending suggestion.");
   }
-}
+});
 
-// Run auth check when page loads
+// Run auth check on page load
 checkAuth();
 </script>
 </body>
 </html>
-
