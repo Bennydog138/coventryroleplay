@@ -34,9 +34,24 @@
   </section>
 
   <!-- UPDATES LIST -->
-  <section class="container" id="updates-container">
-    <div class="card" style="max-width:800px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
+  <section class="container" id="updates-container" style="max-width:800px;margin:auto;">
+    <div class="card" style="padding:20px;background:#1e1e2f;color:#fff;border-radius:12px;">
       <p>Loading updates...</p>
+    </div>
+  </section>
+
+  <!-- ADMIN FORM -->
+  <section class="container" style="max-width:800px;margin:40px auto;">
+    <div class="card" style="padding:20px;background:#1e1e2f;border-radius:12px;">
+      <h2 style="color:#9b59b6;">Add Update (Admin)</h2>
+      <form id="updateForm" enctype="multipart/form-data">
+        <input type="text" name="title" placeholder="Title" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+        <input type="date" name="date" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+        <textarea name="content" placeholder="Content" rows="4" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;"></textarea>
+        <input type="file" name="image" accept="image/*" style="margin-bottom:10px;">
+        <input type="password" name="password" placeholder="Admin Password" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+        <button type="submit" style="width:100%;padding:10px;background:#5865F2;color:#fff;font-weight:bold;border:none;border-radius:6px;cursor:pointer;">Submit Update</button>
+      </form>
     </div>
   </section>
 
@@ -89,6 +104,29 @@
     }
 
     fetchUpdates();
+
+    // Admin form submission
+    document.getElementById("updateForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/api/add_update", {
+          method: "POST",
+          body: formData
+        });
+        const json = await res.json();
+        if (json.success) {
+          alert("✅ Update added successfully!");
+          e.target.reset();
+          fetchUpdates(); // reload updates after adding
+        } else {
+          alert("❌ Error: " + (json.error || "Unknown error"));
+        }
+      } catch(err) {
+        console.error(err);
+        alert("⚠️ Failed to add update.");
+      }
+    });
   </script>
 </body>
 </html>
