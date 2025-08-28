@@ -41,8 +41,18 @@
     </div>
   </section>
 
-  <!-- ADMIN FORM -->
+  <!-- ADMIN ACCESS -->
   <section class="container" style="max-width:800px;margin:40px auto;">
+    <div class="card" style="padding:20px;background:#1e1e2f;border-radius:12px;">
+      <h2 style="color:#9b59b6;">Admin Access</h2>
+      <input type="password" id="adminKey" placeholder="Enter Admin Key" style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
+      <button id="unlockAdmin" style="width:100%;padding:10px;background:#5865F2;color:#fff;font-weight:bold;border:none;border-radius:6px;cursor:pointer;">Unlock Admin Form</button>
+      <p id="adminMessage" style="margin-top:10px;color:#ff6b6b;"></p>
+    </div>
+  </section>
+
+  <!-- ADMIN FORM (HIDDEN BY DEFAULT) -->
+  <section class="container" id="adminFormContainer" style="max-width:800px;margin:40px auto;display:none;">
     <div class="card" style="padding:20px;background:#1e1e2f;border-radius:12px;">
       <h2 style="color:#9b59b6;">Add Update (Admin)</h2>
       <form id="updateForm" enctype="multipart/form-data">
@@ -53,6 +63,7 @@
         <input type="password" name="password" placeholder="Admin Password" required style="width:100%;padding:10px;margin-bottom:10px;border-radius:6px;border:none;background:#2b2b3c;color:#fff;">
         <button type="submit" style="width:100%;padding:10px;background:#5865F2;color:#fff;font-weight:bold;border:none;border-radius:6px;cursor:pointer;">Submit Update</button>
       </form>
+      <p id="updateMessage" style="margin-top:10px;color:#ff6b6b;"></p>
     </div>
   </section>
 
@@ -106,10 +117,33 @@
 
     fetchUpdates();
 
+    // Admin unlock
+    const adminKeyInput = document.getElementById("adminKey");
+    const unlockAdminBtn = document.getElementById("unlockAdmin");
+    const adminMessage = document.getElementById("adminMessage");
+    const adminFormContainer = document.getElementById("adminFormContainer");
+    const updateForm = document.getElementById("updateForm");
+    const updateMessage = document.getElementById("updateMessage");
+
+    const SECRET_KEY = "supersecret123"; // CHANGE to your key
+
+    unlockAdminBtn.addEventListener("click", () => {
+      if (adminKeyInput.value === SECRET_KEY) {
+        adminFormContainer.style.display = "block";
+        adminMessage.style.color = "#4caf50";
+        adminMessage.textContent = "✅ Admin form unlocked!";
+      } else {
+        adminMessage.style.color = "#ff6b6b";
+        adminMessage.textContent = "❌ Invalid key!";
+      }
+      adminKeyInput.value = "";
+    });
+
     // Admin form submission
-    document.getElementById("updateForm").addEventListener("submit", async (e) => {
+    updateForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const formData = new FormData(e.target);
+      updateMessage.textContent = "";
+      const formData = new FormData(updateForm);
       try {
         const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/api/add_update", {
           method: "POST",
@@ -117,15 +151,18 @@
         });
         const json = await res.json();
         if (json.success) {
-          alert("✅ Update added successfully!");
-          e.target.reset();
-          fetchUpdates(); // reload updates after adding
+          updateMessage.style.color = "#4caf50";
+          updateMessage.textContent = "✅ Update added successfully!";
+          updateForm.reset();
+          fetchUpdates();
         } else {
-          alert("❌ Error: " + (json.error || "Unknown error"));
+          updateMessage.style.color = "#ff6b6b";
+          updateMessage.textContent = "❌ Error: " + (json.error || "Unknown error");
         }
       } catch(err) {
         console.error(err);
-        alert("⚠️ Failed to add update.");
+        updateMessage.style.color = "#ff6b6b";
+        updateMessage.textContent = "⚠️ Failed to add update.";
       }
     });
   </script>
