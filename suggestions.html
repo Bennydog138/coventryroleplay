@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -69,14 +69,20 @@
         suggestion: document.getElementById("suggestion").value.trim()
       };
 
+      if (!data.username || !data.suggestion) {
+        alert("Please fill out both fields.");
+        return;
+      }
+
       try {
-        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/suggest", {
+        const res = await fetch("https://your-replit-project-url/suggestions", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data)
         });
 
         const json = await res.json();
+
         if (res.ok && json.success) {
           alert("✅ Suggestion submitted successfully!");
           form.reset();
