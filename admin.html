@@ -13,21 +13,11 @@
         <img src="CV.png" alt="Police Service Logo" class="nav-logo" />
         <span>Coventry Roleplay</span>
       </a>
-      <button class="menu-toggle" aria-expanded="false" aria-controls="site-links">Menu</button>
-      <div id="site-links" class="links" role="menubar">
-        <a role="menuitem" href="index.html">Home</a>
-        <a role="menuitem" href="leadership.html">Leadership</a>
-        <a role="menuitem" href="services.html">Services</a>
-        <a role="menuitem" href="contact.html">Contact</a>
-        <a role="menuitem" href="suggestions.html">Suggestions</a>
-        <a role="menuitem" href="development.html">Development</a>
-      </div>
     </nav>
   </header>
 
-  <section class="container" style="max-width:800px;margin:auto;">
-    <!-- Add Update Form -->
-    <div class="card" style="padding:20px; background:#1e1e2f; color:#fff; border-radius:12px; margin-bottom:30px;">
+  <section class="container">
+    <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
       <h2>Add Development Update</h2>
       <form id="updateForm">
         <label>Admin Password</label><br>
@@ -48,12 +38,6 @@
         <button type="submit" style="padding:10px 20px; background:#5865F2; color:#fff; border:none; border-radius:8px; cursor:pointer;">Add Update</button>
       </form>
     </div>
-
-    <!-- Existing Updates -->
-    <div class="card" style="padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
-      <h2>Existing Updates</h2>
-      <div id="updatesList" style="margin-top:15px;"></div>
-    </div>
   </section>
 
   <footer>
@@ -69,19 +53,20 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Add Update
     document.getElementById("updateForm").addEventListener("submit", async function(e){
       e.preventDefault();
       const form = e.target;
       const data = new FormData(form);
 
       try {
-        const res = await fetch("/api/add_update", { method: "POST", body: data });
+        const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/api/add_update", {
+          method: "POST",
+          body: data
+        });
         const json = await res.json();
         if (res.ok && json.success) {
           alert("✅ Update added successfully!");
           form.reset();
-          loadUpdates();
         } else {
           alert("❌ Failed: " + (json.error || "Unknown error"));
         }
@@ -90,68 +75,6 @@
         alert("⚠️ Error sending update.");
       }
     });
-
-    // Load Updates
-    async function loadUpdates() {
-      const container = document.getElementById("updatesList");
-      container.innerHTML = "Loading...";
-      try {
-        const res = await fetch("/api/updates");
-        const updates = await res.json();
-        if (!Array.isArray(updates) || updates.length === 0) {
-          container.innerHTML = "<p>No updates found.</p>";
-          return;
-        }
-        container.innerHTML = "";
-        updates.forEach((update, index) => {
-          const div = document.createElement("div");
-          div.style.border = "1px solid #333";
-          div.style.padding = "10px";
-          div.style.marginBottom = "10px";
-          div.style.borderRadius = "8px";
-
-          let imgHtml = update.image ? `<img src="/updates_images/${update.image}" alt="" style="max-width:100%;margin-top:10px;border-radius:6px;">` : "";
-
-          div.innerHTML = `
-            <strong>${update.title}</strong> (${update.date})
-            <p>${update.content}</p>
-            ${imgHtml}
-            <button style="padding:5px 10px; background:#FF4C4C; color:#fff; border:none; border-radius:6px; cursor:pointer; margin-top:5px;" onclick="deleteUpdate(${index})">Delete</button>
-          `;
-          container.appendChild(div);
-        });
-      } catch(err) {
-        console.error(err);
-        container.innerHTML = "<p>Error loading updates.</p>";
-      }
-    }
-
-    // Delete Update
-    async function deleteUpdate(id) {
-      const password = prompt("Enter admin password to delete this update:");
-      if (!password) return;
-
-      const formData = new FormData();
-      formData.append("password", password);
-      formData.append("id", id);
-
-      try {
-        const res = await fetch("/api/delete_update", { method: "POST", body: formData });
-        const json = await res.json();
-        if (res.ok && json.success) {
-          alert("✅ Update deleted successfully!");
-          loadUpdates();
-        } else {
-          alert("❌ Failed: " + (json.error || "Unknown error"));
-        }
-      } catch(err) {
-        console.error(err);
-        alert("⚠️ Error deleting update.");
-      }
-    }
-
-    // Initial load
-    loadUpdates();
   </script>
 </body>
 </html>
