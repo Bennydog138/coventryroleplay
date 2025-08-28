@@ -54,15 +54,17 @@
   </section>
 
 <script>
-const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // 🔴 CHANGE THIS TO YOUR REPLIT BACKEND URL
+const backendBase = "https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/"; // 🔴 Replace with your Replit backend URL
 
 async function checkAuth() {
   try {
-    const res = await fetch(`${backendBase}/whoami`, { credentials: "include" });
+    const res = await fetch(`${backendBase}/whoami`, {
+      credentials: "include" // ✅ send cookies for session
+    });
     const data = await res.json();
 
     if (data.authenticated) {
-      document.getElementById("authStatus").textContent = `Logged in as ${data.user.username}#${data.user.discriminator}`;
+      document.getElementById("authStatus").textContent = `Logged in as ${data.user.username}`;
       document.getElementById("loginBtn").style.display = "none";
       document.getElementById("logoutBtn").style.display = "inline-block";
       document.getElementById("suggestionForm").style.display = "block";
@@ -89,7 +91,7 @@ document.getElementById("suggestionForm").addEventListener("submit", async funct
     const res = await fetch(`${backendBase}/suggest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
+      credentials: "include", // ✅ send cookies for session
       body: JSON.stringify(payload)
     });
     const result = await res.json();
@@ -104,10 +106,11 @@ document.getElementById("suggestionForm").addEventListener("submit", async funct
     console.error(err);
     alert("⚠️ Error sending suggestion.");
   }
-});
+}
 
-// Run auth check on load
+// Run auth check when page loads
 checkAuth();
 </script>
 </body>
 </html>
+
