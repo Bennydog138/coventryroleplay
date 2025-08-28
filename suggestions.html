@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- HEADER -->
   <header>
     <nav class="nav" aria-label="Primary">
       <a class="brand" href="index.html" aria-label="Coventry Roleplay Home">
@@ -25,7 +24,6 @@
     </nav>
   </header>
 
-  <!-- HERO -->
   <section class="hero small">
     <div class="hero-inner">
       <h1 class="title reveal"><span class="grad">Suggestions</span></h1>
@@ -33,7 +31,6 @@
     </div>
   </section>
 
-  <!-- FORM -->
   <section class="container">
     <div class="card" style="max-width:600px;margin:auto; padding:20px; background:#1e1e2f; color:#fff; border-radius:12px;">
       <form id="suggestionForm">
@@ -48,7 +45,6 @@
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
       <div class="brand" aria-hidden="true">
@@ -59,7 +55,6 @@
     </div>
   </footer>
 
-  <!-- SCRIPT -->
   <script>
     document.getElementById("suggestionForm").addEventListener("submit", async function(e) {
       e.preventDefault();
@@ -76,11 +71,10 @@
 
       try {
         const res = await fetch("https://9ad39be4-cdef-47ab-acfe-32b52712ad73-00-3t3dvnup6jz45.kirk.replit.dev/suggest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-      });
-
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
 
         const json = await res.json();
 
@@ -96,9 +90,7 @@
       }
     });
 
-    // Set the current year
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
-
